@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "gcc - Build and debug active file",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "C/C++: g++ build active file",
+      "miDebuggerPath": "/usr/bin/gdb"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": ["9000"],
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "cwd": "/home/stud/ngk/tcp_socket_Exercise_06",
+      "program": "/home/stud/ngk/tcp_socket_Exercise_06/server",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

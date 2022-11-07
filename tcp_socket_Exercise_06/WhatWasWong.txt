@@ -1,0 +1,11 @@
+
+
+Programmet kunne ikke find ud af det med fgets den tog også \n og nogle karaktere foran.
+Med arguments fungere det, jeg tænker de vil have vi skal bruge arguments fordi fgets ikke fungere...
+Næste gang burde vi læse hvad opgaven egentligt var.
+
+Flere steder brugte vi den forkerte buffer.
+
+
+open(.., O_creat, O_RDWR) //Det fucker up
+open(...,O_creat|O_RDWR) // skal være sådan
