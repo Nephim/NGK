@@ -20,7 +20,7 @@ OBJ_DEST_DIR=build/${DEST_DIR}
 BIN_DEST_DIR=bin/${DEST_DIR}
 LIB_DEST_DIR=lib/${DEST_DIR}
 
-COMMON=main.cpp 
+COMMON=main.cpp
 SRC=${COMMON} 
 OBJS=$(addprefix ${OBJ_DEST_DIR}/,$(notdir ${SRC:%.cpp=%.o}))
 DEPS=$(addprefix ${OBJ_DEST_DIR}/,$(notdir ${SRC:%.cpp=%.d}))
