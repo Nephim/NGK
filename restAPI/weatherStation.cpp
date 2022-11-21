@@ -6,7 +6,6 @@ weatherStationHandler_t::weatherStationHandler_t(weatherStation_t & registration
 	: m_registrations{ registrations }
 	{}
 
-
 restinio::response_builder_t<restinio::restinio_controlled_output_t> weatherStationHandler_t::onWeatherList(const restinio::request_handle_t& req, rr::route_params_t ) const
 {
 	auto resp = init_resp( req->create_response() );

@@ -113,6 +113,16 @@ public:
 
 		return resp.done();
 	}
+
+	auto options(restinio::request_handle_t req, restinio::router::route_params_t) // needs documentation
+	{
+		const auto methods = "OPTIONS, GET, POST, PATCH, DELETE, PUT";
+		auto resp = init_resp(req->create_response());
+		resp.append_header(restinio::http_field::access_control_allow_methods, methods);
+		resp.append_header(restinio::http_field::access_control_allow_headers, "content-type");
+		resp.append_header(restinio::http_field::access_control_max_age, "86400");
+		return resp.done();
+	}
 	
 
 private:
@@ -124,7 +134,8 @@ private:
 		resp
 			.append_header( "Server", "RESTinio sample server /v.0.6" )
 			.append_header_date_field()
-			.append_header( "Content-Type", "text/plain; charset=utf-8" );
+			.append_header( "Content-Type", "text/plain; charset=utf-8" )
+			.append_header(restinio::http_field::access_control_allow_origin, "*");  // needs documentation
 
 		return resp;
 	}
@@ -147,11 +158,11 @@ auto serverWeatherHandler(weatherStation_t & weatherStation)
 		return std::bind( method, handler, _1, _2 );
 	};
 
-	auto method_not_allowed = []( const auto & req, auto ) {
-			return req->create_response( restinio::status_method_not_allowed() )
-					.connection_close()
-					.done();
-	};
+	// auto method_not_allowed = []( const auto & req, auto ) {
+	// 		return req->create_response( restinio::status_method_not_allowed() )
+	// 				.connection_close()
+	// 				.done();
+	// };
 
 	// Handler for '/' path.
 	router->http_get( "/", by( &weatherStationHandler_t::onWeatherList ) );
@@ -164,11 +175,9 @@ auto serverWeatherHandler(weatherStation_t & weatherStation)
 	// Handler for update entry
 	router->http_put( "/update-by-id/:id", by( &weatherStationHandler_t::onUpdate ) );
 
+	router->add_handler(restinio::http_method_options(), "/", by(&weatherStationHandler_t::options));
 		// Disable all other methods for '/'.
-	router->add_handler(
-			restinio::router::none_of_methods(
-					restinio::http_method_get(), restinio::http_method_post() ),
-			"/", method_not_allowed );
+	//router->add_handler(restinio::router::none_of_methods(restinio::http_method_get(), restinio::http_method_post() ),"/", method_not_allowed );
 
 	return router;
 }
