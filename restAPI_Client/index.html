@@ -6,15 +6,23 @@
 
 <title>Weather Station</title>
 
-<link rel="stylesheet" type="text/css" href="style.css" media="all">
-
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/js/tabulator.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/css/tabulator.min.css"></link>
+
+
 <script src="js/http-methods.js"></script>
+<script src="js/table.js"></script>
+<script src="js/onPageLoad.js"></script>
+
+<link rel="stylesheet" type="text/css" href="style.css" media="all">
 
 <meta/>
 </head>
 
-<body>
+<body onload="onPageLoad()">
 	<h1>Weather Station Client</h1>
 	<div class = "content-box">
 		<div class = "input-form">
@@ -45,26 +53,25 @@
 			<div class="input-submit">
 				<input type="submit" value="submit" onclick="sendData()">
 			</div>
+			<div class="input-submit">
+				<input type="submit" value="updateData" onclick="updateData(document.getElementById('id').value)">
+			</div>
+		
+		</div>
+		<div class="table-box">
+			<div class="table">
+				<div id="table">
+				</div>
+			</div>
+			<div class = "get-data">
+				<input type="submit" value="getData" onclick="getData()">
+			</div>
+			<div class = "get-data">
+				<input type="submit" value="getThree" onclick="getThree()">
+			</div>
 			
 		</div>
-		<div class = "get-data">
-			<input type="submit" value="getData" onclick="getData()">
-		</div>
-		<div class = "get-data">
-			<input type="submit" value="getThree" onclick="getThree()">
-		</div>
-		<table>
-			<thead>
-				<tr>
-					<th colspan="2">The table header</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>The table body</td>
-					<td>with two columns</td>
-				</tr>
-			</tbody>
-		</table>
+		
+		
 	</div>	
 </body>

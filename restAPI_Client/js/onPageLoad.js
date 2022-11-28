@@ -1,0 +1,6 @@
+function onPageLoad()
+{	
+	drawTable();
+	getOptions();
+
+}

@@ -7,7 +7,7 @@ struct place_t
 {
 	place_t() = default;
 
-	place_t(std::string placeName, float lat, float lon) : 
+	place_t(std::string placeName, double lat, double lon) : 
 	m_placeName{ std::move( placeName ) },
 	m_lat{ std::move( lat ) },
 	m_lon{ std::move( lon ) }

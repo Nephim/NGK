@@ -24,11 +24,20 @@ body {
 
 }
 
+.table-box {
+	float: right;
+	border-color: grey;
+	border-style: solid;
+	border-width: 2px;
+}
+
 .input-form {
 	border-color: grey;
 	border-style: solid;
 	border-width: 2px;
-	display: inline-block;
+	/*display: inline-block;*/
+	float:left;
+	
 }
 
 .input-item {
@@ -38,7 +47,7 @@ body {
 
 input[type=text]
 {
-	font-size: 18px;
+	font-size: 24px;
 }
 
 
@@ -55,15 +64,7 @@ input[type=submit]
 
 .get-data {
 	padding: 1%;
-}
-
-table,
-td {
-    border: 1px solid #333;
-}
-
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
+	/*display: inline-block;*/
+	float: left;
+	
 }
