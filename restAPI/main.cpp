@@ -11,6 +11,16 @@ using weatherStation_t = std::vector< weatherRegistraiton_t >;
 namespace rr = restinio::router;
 using router_t = rr::express_router_t<>;
 
+#include <string>
+#include <restinio/websocket/websocket.hpp>
+
+namespace rws = restinio::websocket::basic;
+
+using ws_registry_t = std::map< std::uint64_t, rws::ws_handle_t >;
+
+using traits_t = restinio::traits_t< restinio::asio_timer_manager_t, restinio::single_threaded_ostream_logger_t, router_t >;
+
+
 class weatherStationHandler_t
 {
 public:
@@ -34,6 +44,7 @@ public:
 		try
 		{
 			m_registrations.emplace_back(json_dto::from_json< weatherRegistraiton_t >( req->body() ) );
+			sendMessage("POST: id = " + json_dto::from_json<weatherRegistraiton_t>(req->body()).m_id);
 		}
 		catch( const std::exception & /*ex*/ )
 		{
@@ -98,6 +109,7 @@ public:
 				{
 					w = entry;
 					isID = true;
+					sendMessage("PUT: id = " + json_dto::from_json<weatherRegistraiton_t>(req->body()).m_id);
 				}
 			}
 			if(!isID)
@@ -114,18 +126,92 @@ public:
 		return resp.done();
 	}
 
+	auto onDelete(const restinio::request_handle_t& req, rr::route_params_t params)
+	{
+		std::string path(req->header().path());
+		const auto id = std::stoi(path.substr(path.find("delete/") + 7));
+
+		auto resp = init_resp( req->create_response() );
+
+		try
+		{
+			bool isID = false;
+			for(auto it = m_registrations.begin(); it != m_registrations.end(); it++)
+			{
+				if(it->m_id == id)
+				{
+					m_registrations.erase(it--);
+					isID = true;
+					sendMessage("DELETE: id = " + id);
+				}
+			}
+			if(!isID)
+			{
+				std::cout << "notID" << "\n";
+				mark_as_bad_request( resp );
+				resp.set_body( "No weather data with #" + std::to_string( id ) + "\n" );
+			}
+		}
+		catch( const std::exception & ex )
+		{
+			std::cerr << ex.what();
+			mark_as_bad_request( resp );
+		}
+
+		return resp.done();
+	}
+
 	auto options(restinio::request_handle_t req, restinio::router::route_params_t) // needs documentation
 	{
-		const auto methods = "OPTIONS, GET, POST, PUT, DELETE";	
+		std::cout << "Options called " << "\n";
+		const auto methods = "OPTIONS, GET, POST, PUT, DELETE, delete,";	
 		auto resp = init_resp(req->create_response());
 		resp.append_header(restinio::http_field::access_control_allow_methods, methods);
 		resp.append_header(restinio::http_field::access_control_allow_headers, "content-type");
 		resp.append_header(restinio::http_field::access_control_max_age, "86400");
 		return resp.done();
 	}
+
+	auto on_live_update(const restinio::request_handle_t & req, rr::route_params_t params) 
+	{
+    	if (restinio::http_connection_header_t::upgrade == req->header().connection()) 
+		{
+	        auto wsh = rws::upgrade<traits_t>( *req, rws::activation_t::immediate, [this](auto wsh, auto m)
+			{
+                if (rws::opcode_t::text_frame == m->opcode() ||
+					rws::opcode_t::binary_frame == m->opcode() ||
+                    rws::opcode_t::continuation_frame == m->opcode()) 
+					{
+                    	wsh->send_message(*m);
+                	} 
+					else if (rws::opcode_t::ping_frame == m->opcode()) 
+					{
+                    	auto resp = *m;
+                    	resp.set_opcode(rws::opcode_t::pong_frame);
+                    	wsh->send_message(resp);
+                	} 
+					else if (rws::opcode_t::connection_close_frame == m->opcode()) 
+					{
+                    	m_registry.erase(wsh->connection_id());
+                	}
+            	});
+        	m_registry.emplace(wsh->connection_id(), wsh);
+       		init_resp(req->create_response()).done();
+        	return restinio::request_accepted();
+   		}
+    	return restinio::request_rejected();
+	}
 	
 private:
 	weatherStation_t& m_registrations;
+
+	ws_registry_t m_registry;
+	
+	void sendMessage(std::string message)
+	{
+		for(auto [k, v] : m_registry)
+			v->send_message(rws::final_frame, rws::opcode_t::text_frame, message);
+	}
 
 	template < typename RESP >
 	static RESP init_resp( RESP resp )
@@ -167,10 +253,15 @@ auto serverWeatherHandler(weatherStation_t & weatherStation)
 	router->http_get( "/three/", by( &weatherStationHandler_t::onGetThree) );
 	// Handler for update entry
 	router->http_put( "/update-by-id/:id", by( &weatherStationHandler_t::onUpdate ) );
+	router->add_handler(restinio::http_method_options(), "/update-by-id/:id", by(&weatherStationHandler_t::options));
+
+	router->http_delete( "/delete/:id", by ( &weatherStationHandler_t::onDelete ) );
+	router->add_handler(restinio::http_method_options(), "/delete/:id", by(&weatherStationHandler_t::options));
 
 	router->add_handler(restinio::http_method_options(), "/", by(&weatherStationHandler_t::options));
 
-	router->add_handler(restinio::http_method_options(), "/update-by-id/:id", by(&weatherStationHandler_t::options));
+	router->http_get("/chat", by(&weatherStationHandler_t::on_live_update));
+
 
 	return router;
 }
@@ -181,11 +272,6 @@ int main()
 
 	try
 	{
-		using traits_t =
-			restinio::traits_t<
-				restinio::asio_timer_manager_t,
-				restinio::single_threaded_ostream_logger_t,
-				router_t >;
 
 		weatherStation_t weatherStation{
 			{1, "20211105", "12:15", {"Aarhus N", 13.692, 19.438}, 13.1, "70%"},

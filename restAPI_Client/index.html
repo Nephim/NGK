@@ -12,9 +12,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/js/tabulator.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/css/tabulator.min.css"></link>
 
-
 <script src="js/http-methods.js"></script>
 <script src="js/table.js"></script>
+<script src="js/webSocket.js"></script>
 <script src="js/onPageLoad.js"></script>
 
 <link rel="stylesheet" type="text/css" href="style.css" media="all">
@@ -30,31 +30,34 @@
 				<input id="id" type="text" placeholder="ID:">
 			</div>
 			<div class="input-item">
-				<input id="date" type="text" placeholder="Date">
+				<input id="date" type="text" placeholder="Date:">
 			</div>
 			<div class="input-item">
-				<input id="time" type="text" placeholder="Time">
+				<input id="time" type="text" placeholder="Time:">
 			</div>
 			<div class="input-item">
-				<input id="placename" type="text" placeholder="Place Name">
+				<input id="placename" type="text" placeholder="Place Name:">
 			</div>
 			<div class="input-item">
-				<input id="latitude" type="text" placeholder="Latitude">
+				<input id="latitude" type="text" placeholder="Latitude:">
 			</div>
 			<div class="input-item">
-				<input id="longitude" type="text" placeholder="Longitude">
+				<input id="longitude" type="text" placeholder="Longitude:">
 			</div>
 			<div class="input-item">
-				<input id="temperature" type="text" placeholder="Temperature">
+				<input id="temperature" type="text" placeholder="Temperature:">
 			</div>
 			<div class="input-item">
-				<input id="humidity" type="text" placeholder="Humidity">
+				<input id="humidity" type="text" placeholder="Humidity:">
 			</div>
 			<div class="input-submit">
 				<input type="submit" value="submit" onclick="sendData()">
 			</div>
 			<div class="input-submit">
 				<input type="submit" value="updateData" onclick="updateData(document.getElementById('id').value)">
+			</div>
+			<div class="input-submit">
+				<input type="submit" value="deleteData" onclick="deleteData(document.getElementById('id').value)">
 			</div>
 		
 		</div>

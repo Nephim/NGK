@@ -82,3 +82,14 @@ function getOptions()
 		console.log(error);
 	});
 }
+
+function deleteData(idnumber)
+{
+	axios.delete('http://127.0.0.1:8080/delete/' + idnumber)
+	.then(function (response) {
+		console.log(response);
+	})
+	.catch(function (error) {
+		console.log(error);
+	});
+}
